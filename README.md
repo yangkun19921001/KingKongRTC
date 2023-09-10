@@ -1,2 +1,2 @@
 # KingKongRTC
-This library is based on the secondary development of webrtc
+This is a cross-platform RTC library
