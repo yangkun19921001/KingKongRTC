@@ -65,6 +65,9 @@ if(POLICY CMP0146)
   cmake_policy(SET CMP0146 OLD)  # CMake 3.27+: use CMake FindCUDA if available.
 endif()
 
+project(kkrtc  CXX C)
+message(STATUS "Build kkrtc: ${KKRTC_VERSION}")
+
 
 if(NOT KKRTC_SKIP_CMAKE_SYSTEM_FILE)
   include("cmake/platforms/KKRTC-${CMAKE_SYSTEM_NAME}.cmake" OPTIONAL RESULT_VARIABLE "KKRTC_CMAKE_SYSTEM_FILE")
@@ -87,8 +90,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)  # https://cmake.org/cmake/help/
 endif()
 
 
-project(kkrtc VERSION ${KKRTC_VERSION} LANGUAGES CXX C)
-message(STATUS "Build kkrtc: ${KKRTC_VERSION}")
+
 
 # ---------------------------------------------------------------------------------------
 # Set default build to release
@@ -100,10 +102,37 @@ endif()
 # ---------------------------------------------------------------------------------------
 # Compiler config
 # ---------------------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Save libs and executables in the same place
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Output directory for applications")
+
+
+add_definitions(
+        -DKKRTC_ENABLE_SYMBOL_EXPORT
+        -DKKRTC_LIBRARY_IMPL
+        -DENABLE_PLUGINS
+        -DKK_VIDEO_CAP_PLUGIN_SUBDIRECTORY
+)
+
+set(kkrtc_libs)
+set(kkrtc_base)
+set(3RDPARTY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
+
+add_subdirectory(api)
+add_subdirectory(kkrtc_base)
+add_subdirectory(sdk)
+add_subdirectory(modules)
+add_subdirectory(test)
+
+message("kkrtc_libs: ${kkrtc_libs}")
+message("kkrtc_include ${KKRTC_SDK_HARDS}")
+
+
+
+
+
+
 
 
