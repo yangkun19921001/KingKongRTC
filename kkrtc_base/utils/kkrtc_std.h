@@ -176,6 +176,11 @@ double memory deallocation.
         return result;
     }
 
+    template <typename T>
+    static const T& KKMIN(const T& a, const T& b) {
+        return (a < b) ? a : b;
+    }
+
 #endif // OPENCV_DISABLE_STRING_LOWER_UPPER_CONVERSIONS
 
 //! @} core_basic

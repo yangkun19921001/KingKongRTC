@@ -47,4 +47,5 @@ INSTALL ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/		DESTINATION include )
 
 # create the .deb and .rpm packages using cpack
 INCLUDE ( ${ly_base_dir}/CM_linux_packages.cmake )
+
 set_target_properties(${ly_lib_static} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)

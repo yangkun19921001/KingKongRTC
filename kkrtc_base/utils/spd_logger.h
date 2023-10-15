@@ -7,11 +7,11 @@
 
 #include "logger_interface.h"
 
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/async.h>
-#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/include/spdlog/spdlog.h>
+#include <spdlog/include/spdlog/sinks/basic_file_sink.h>
+#include <spdlog/include/spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/include/spdlog/async.h>
+#include <spdlog/include/spdlog/sinks/rotating_file_sink.h>
 
 namespace kkrtc {
     namespace utils {
