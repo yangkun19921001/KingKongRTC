@@ -9,6 +9,8 @@
 #include "video_frame.h"
 #include "kkrtc_video_sink_interface.h"
 #include "dshowcapture.h"
+#include "kkrtc_plugin_log_observer.h"
+
 namespace kkrtc {
     namespace vcap {
 
@@ -18,7 +20,8 @@ namespace kkrtc {
 
             WinCameraCaptureDS() ;
             WinCameraCaptureDS(int index,KKMediaFormat &mediaFormat);
-            void SetVideoSink(kkrtc::VideoSinkInterface<VideoFrame> * videoSinkInterface);
+            void SetVideoCallback(VideoCaptureObserver * videoCaptureObserver);
+            void SetLogCallback(kkrtc::KKLogObserver *kk_log_callback);
             void Initialize(const kkrtc::KKMediaFormat &mediaFormats) override;
 
             bool IsOpened() const override;
@@ -37,12 +40,15 @@ namespace kkrtc {
 
             int m_width,m_height,m_framerate ,m_fourcc;
             bool m_auto_focus;
-            kkrtc::VideoSinkInterface<kkrtc::VideoFrame>* video_sink_interface_;
+            VideoCaptureObserver* video_callback_;
             KKMediaFormat media_format_;
         public:
             int m_camera_index_;
             DShow::Device device_;
             DShow::VideoConfig videoConfig_;
+            kkrtc::KKLogObserver* log_callback_;
+
+
         };
 
     }//namespace cap

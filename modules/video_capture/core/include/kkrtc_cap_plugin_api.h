@@ -57,13 +57,22 @@ typedef struct KKVideoCapture_t* KkPluginCapture;
         int (*capture_open_with_params)(KkPluginCapture  handle,int camera_index,const char*filename, int* params, unsigned n_params);
 
         /**
-         *  添加一个设置VideoSink的函数指针
-         *   注意：我们使用了void*作为参数，这是因为C语言不支持C++模板。但在实际使用时，我们会传递一个VideoSinkInterface的指针。
+         *  添加一个设置VideoCaptureObserver的指针
+         *   注意：我们使用了void*作为参数，这是因为C语言不支持C++模板。但在实际使用时，我们会传递一个VideoCaptureObserver的指针。
          * @param handle 采集句柄
          * @param video_sink_interface 视频数据的回调函数
          * @return
          */
-        void (*set_video_sink)(KkPluginCapture handle, void* video_sink_interface);
+        int (*set_video_callback)(KkPluginCapture handle, void* video_cap_callback);
+
+        /**
+         *  添加一个设置VideoCaptureObserver的指针
+         *   注意：我们使用了void*作为参数，这是因为C语言不支持C++模板。但在实际使用时，我们会传递一个VideoCaptureObserver的指针。
+         * @param handle 采集句柄
+         * @param video_sink_interface 视频数据的回调函数
+         * @return
+         */
+        int (*set_log_callback)(KkPluginCapture handle, void* video_log_callback);
 
         /**
          *  切换摄像头

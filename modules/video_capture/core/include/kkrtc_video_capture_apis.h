@@ -4,16 +4,18 @@
 
 #ifndef KKRTC_KKRTC_VIDEO_CAPTURE_APIS_H
 #define KKRTC_KKRTC_VIDEO_CAPTURE_APIS_H
+#include <stdint.h>
+#include "kkrtc_mediaformat.h"
 namespace kkrtc {
     namespace vcap {
         enum KKVideoCaptureAPIs {
             KK_CAP_ANY = 0,
 
             //windows
-            KK_CAP_DSHOW = 1000,
+            KK_CAP_DSHOW = 100,
 
             //ANDROID
-            KK_CAP_ANDROID_NDK,
+            KK_CAP_ANDROID_NDK=200,
             KK_CAP_ANDROID_JNI,
 
         };
@@ -26,10 +28,41 @@ namespace kkrtc {
             KK_CAP_PROP_COLOR_FORMAT = 40,//颜色格式
         };
 
-        enum KKVideoCaptureFormat {
 
-            I420 = 0,
-            RGB24,
+        struct KKVideoCapConfig {
+            int32_t width;
+            int32_t height;
+            int32_t maxFPS;
+            int32_t rotation;
+            kkrtc::KKVideoFormat videoType;
+            bool interlaced;
+
+            KKVideoCapConfig() {
+                width = 0;
+                height = 0;
+                maxFPS = 0;
+                rotation = 0;
+                videoType = kkrtc::KKVideoFormat::Unknown;
+                interlaced = false;
+            }
+            bool operator!=(const KKVideoCapConfig& other) const {
+                if (width != other.width)
+                    return true;
+                if (height != other.height)
+                    return true;
+                if (maxFPS != other.maxFPS)
+                    return true;
+                if (videoType != other.videoType)
+                    return true;
+                if (interlaced != other.interlaced)
+                    return true;
+                if (rotation != other.rotation)
+                    return true;
+                return false;
+            }
+            bool operator==(const KKVideoCapConfig& other) const {
+                return !operator!=(other);
+            }
         };
     }
 }

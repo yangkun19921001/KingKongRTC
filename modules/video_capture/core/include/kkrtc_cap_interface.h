@@ -6,6 +6,7 @@
 #define KKRTC_KKRTC_CAP_INTERFACE_H
 #include <vector>
 #include "kkrtc_mediaformat.h"
+#include "kkrtc_video_capture_apis.h"
 namespace kkrtc {
     namespace vcap {
         class IVideoCapture {
@@ -18,6 +19,14 @@ namespace kkrtc {
         };
 
 
+        class VideoCaptureObserver {
+        public:
+            virtual ~VideoCaptureObserver() = default;
+
+            virtual void IncomingFrame(uint8_t* videoFrame,
+                                       size_t videoFrameLength,
+                                       const KKVideoCapConfig& frame, int64_t captureTime = 0) = 0;
+        };
     }//namesapce vcap
 } // namespace kkrtc
 

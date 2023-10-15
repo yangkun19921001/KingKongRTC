@@ -5,7 +5,7 @@
 #include "kkrtc_plugin_loader.h"
 #include "kkrtc_cap_plugin_api.h"
 #include "kkrtc_std.h"
-
+#include "kkrtc_plugin_log_observer.h"
 namespace kkrtc {
     namespace vcap {
 
@@ -52,12 +52,12 @@ namespace kkrtc {
 
             std::shared_ptr<IVideoCapture> createCapture(int camera) const;
 
-            std::shared_ptr<IVideoCapture> createCapture(int camera, const KKMediaFormat &params) const override;
+            std::shared_ptr<IVideoCapture> createCapture(int camera, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver*logObserver) const override;
 
             std::shared_ptr<IVideoCapture> createCapture(const std::string &filename) const;
 
             std::shared_ptr<IVideoCapture>
-            createCapture(const std::string &filename, const KKMediaFormat &params) const override;
+            createCapture(const std::string &filename, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver*logObserver) const override;
 
         };
 
@@ -270,32 +270,35 @@ namespace kkrtc {
                 assert(cap_plugin_api_); assert(kk_capture_);
             }
             static std::shared_ptr<PluginCapture> create(const KKVideoCapturePluginAPI * cap_plugin_api,
-                                                         const std::string &filename, int camera, const KKMediaFormat &mediaFormat){
+                                                         const std::string &filename, int camera, const KKMediaFormat &mediaFormat,VideoCaptureObserver * captureObserver,kkrtc::KKLogObserver * kkLogObserver){
                 assert(cap_plugin_api);
                 KkPluginCapture kk_capture = nullptr;
 
                 std::vector<int> vint_params = mediaFormat.getIntVector();
                 int* c_params = vint_params.data();
                 unsigned n_params = (unsigned)(vint_params.size() / 2);
+
                 if (cap_plugin_api->capture_initialize(&kk_capture) != 0)
                 {
                     KKLogErrorTag("video-cap") << cap_plugin_api<<" capture_initialize error.";
-                    //cap_plugin_api->set_video_sink(kk_capture,)
+                    return nullptr;
                 }
+                cap_plugin_api->set_log_callback(kk_capture,kkLogObserver);
+                cap_plugin_api->set_video_callback(kk_capture,captureObserver);
                 if (0 == cap_plugin_api->capture_open_with_params(kk_capture,camera,filename.empty() ? 0 : filename.c_str(),c_params,n_params))
                 {
                     assert(kk_capture);
                     return makePtr<PluginCapture>(cap_plugin_api, kk_capture);;
                 }
-                return makePtr<PluginCapture>(cap_plugin_api, kk_capture);
+                return nullptr;
             }
         };
 
-        std::shared_ptr<IVideoCapture> PluginCapBackend::createCapture(int camera, const KKMediaFormat &params) const {
+        std::shared_ptr<IVideoCapture> PluginCapBackend::createCapture(int camera, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver*logObserver) const {
             try
             {
             if (kkrtc_cap_api_){
-                return PluginCapture::create(kkrtc_cap_api_,std::string(),camera,params);
+                return PluginCapture::create(kkrtc_cap_api_,std::string(),camera,params,capobserver,logObserver);
             }
             }
             catch (...)
@@ -315,11 +318,11 @@ namespace kkrtc {
         }
 
         std::shared_ptr<IVideoCapture>
-        PluginCapBackend::createCapture(const std::string &filename, const KKMediaFormat &params) const {
+        PluginCapBackend::createCapture(const std::string &filename, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver * logObserver) const {
             try
             {
                 if (kkrtc_cap_api_){
-                    return PluginCapture::create(kkrtc_cap_api_,filename,0,params);
+                    return PluginCapture::create(kkrtc_cap_api_,filename,0,params,capobserver,logObserver);
                 }
             }
             catch (...)

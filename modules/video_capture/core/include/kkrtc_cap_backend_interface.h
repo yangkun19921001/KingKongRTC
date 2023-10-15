@@ -8,6 +8,8 @@
 #include "kkrtc_cap_interface.h"
 #include "kkrtc_video_capture_apis.h"
 #include "kkrtc_std_wrapper.h"
+#include "kkrtc_plugin_log_observer.h"
+
 #include <memory>
 #include <string>
 namespace kkrtc {
@@ -15,8 +17,8 @@ namespace kkrtc {
         class ICapBackend {
         public:
             virtual ~ICapBackend(){}
-            virtual std::shared_ptr<IVideoCapture> createCapture(int camera, const KKMediaFormat& params) const = 0;
-            virtual std::shared_ptr<IVideoCapture> createCapture(const std::string &filename, const KKMediaFormat& params) const = 0;
+            virtual std::shared_ptr<IVideoCapture> createCapture(int camera, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver*logObserver) const = 0;
+            virtual std::shared_ptr<IVideoCapture> createCapture(const std::string &filename, const KKMediaFormat& params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver * logObserver) const = 0;
         };
 
         class ICapBackendFactory {

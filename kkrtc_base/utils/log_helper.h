@@ -30,5 +30,18 @@ kkrtc::KKPtr<kkrtc::utils::log::ILogger> GetGlobLogger();
 #define KKLogTraceTag(tag)  if(!globalLogger) std::cout << "Error: globalLogger not init." <<std::endl; else kkrtc::utils::log::LogStream(kkrtc::utils::log::LogLevel::TRACE, globalLogger, tag, __FILE__, __LINE__)
 #define KKLogWarnTag(tag)   if(!globalLogger) std::cout << "Error: globalLogger not init." <<std::endl; else kkrtc::utils::log::LogStream(kkrtc::utils::log::LogLevel::WARNING, globalLogger,tag, __FILE__, __LINE__)
 
+#define PLUGIN_LOG(level, module_name, msg, log_observer) if(log_observer) log_observer->OnLogMessage(kkrtc::utils::log::LogLevel::level, module_name, msg);
+
+#define PLUGIN_LOG_ERR(module_name,  msg, log_observer) \
+    PLUGIN_LOG(ERR, module_name, msg, log_observer)
+
+#define PLUGIN_LOG_WARN(module_name,  msg, log_observer) \
+    PLUGIN_LOG(WARNING, module_name,  msg, log_observer)
+
+#define PLUGIN_LOG_DEBUG(module_name,  msg, log_observer) \
+    PLUGIN_LOG(DEBUG, module_name,  msg, log_observer)
+
+#define PLUGIN_LOG_INFO(module_name,  msg, log_observer) \
+    PLUGIN_LOG(INFO, module_name,  msg, log_observer)
 
 #endif //KKRTC_LOG_HELPER_H

@@ -50,7 +50,7 @@ namespace kkrtc {
                     if (!backend.empty())
                     {
                         try {
-                            cap_ = backend->createCapture(index,params);
+                            cap_ = backend->createCapture(index,params,this, this);
                             if (!cap_.empty())
                             {
                                 if (cap_->IsOpened())
@@ -87,9 +87,11 @@ namespace kkrtc {
             cap_.release();
         }
 
-
-        void VideoCapture::OnFrame(const VideoFrame &frame) {
-
-        };
+        void VideoCapture::IncomingFrame(uint8_t *videoFrame, size_t videoFrameLength, const KKVideoCapConfig &config,
+                                         int64_t captureTime) {
+            KKLogDebugTag("IncomingFrame") << config.width << ":" << config.height << " format:" << (int) config.videoType
+                       <<"  fps:" << (int) config.maxFPS
+                       <<"  startTime:" << captureTime;
+        }
     }// namespace vcap
 }// namespace kkrtc

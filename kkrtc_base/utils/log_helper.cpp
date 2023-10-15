@@ -12,10 +12,7 @@ void InitGlobLogger(kkrtc::KKPtr<kkrtc::utils::log::ILogger> logger) {
 
 kkrtc::KKPtr<kkrtc::utils::log::ILogger> GetGlobLogger() {
     if (globalLogger_.empty()) {
-        globalLogger_ = kkrtc::utils::log::LoggerFactory::createLogger(
-                kkrtc::utils::log::LoggerId::SPDLOG);
-        KKLogConfig_SetConsoleOutput(true);
-        KKLogConfig_SetLogLevel(kkrtc::utils::log::LogLevel::INFO)
+
     }
     return globalLogger_;
 }

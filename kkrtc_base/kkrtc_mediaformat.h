@@ -11,6 +11,23 @@
 
 namespace kkrtc {
 
+    enum KKVideoFormat {
+        Unknown = -1,
+        I420,
+        IYUV,
+        RGB24,
+        ARGB,
+        RGB565,
+        YUY2,
+        YV12,
+        UYVY,
+        MJPEG,
+        BGRA,
+        YVYU,
+        NV12,
+        NV21
+    };
+
     template <class T>
     inline T castParameterTo(int paramValue)
     {

@@ -7,19 +7,17 @@
 
 #include <vector>
 #include "kkrtc_std.h"
-#include "kkrtc_video_capture_apis.h"
 #include "kkrtc_cap_interface.h"
-#include "kkrtc_video_sink_interface.h"
-#include "video_frame.h"
+#include "kkrtc_plugin_log_observer.h"
+
 namespace kkrtc {
     namespace vcap {
         /**
         * @brief VideoCapture 类提供一个用于捕获视频数据的接口。
         * 它支持使用各种API从文件和设备打开视频。
         */
-        class VideoCapture : public VideoSinkInterface<VideoFrame> {
+        class VideoCapture : public VideoCaptureObserver, kkrtc::KKLogObserver {
         public:
-
             /**
              * @brief VideoCapture 的默认构造函数。
              */
@@ -32,7 +30,7 @@ namespace kkrtc {
              * @param apiPreference 优选的视频捕获API。
              * @param params 打开设备时的参数列表。
              */
-            explicit VideoCapture(int index, int apiPreference,  const KKMediaFormat &params);
+            explicit VideoCapture(int index, int apiPreference, const KKMediaFormat &params);
 
             /**
              * @brief 用指定的文件名、API偏好和参数构造一个 VideoCapture 对象。
@@ -41,7 +39,7 @@ namespace kkrtc {
              * @param apiPreference 优选的视频捕获API。
              * @param params 打开文件时的参数列表。
              */
-            explicit VideoCapture(const String &filename, int apiPreference,  const KKMediaFormat &params);
+            explicit VideoCapture(const String &filename, int apiPreference, const KKMediaFormat &params);
 
             /**
              * @brief 用指定的文件名、API偏好和参数打开视频源。
@@ -83,7 +81,9 @@ namespace kkrtc {
             /**
              * @brief  视频采集到的回调函数
              */
-            virtual void OnFrame(const VideoFrame& frame);
+            virtual void IncomingFrame(uint8_t *videoFrame,
+                                       size_t videoFrameLength,
+                                       const KKVideoCapConfig &frame, int64_t captureTime = 0);
 
         protected:
             /**
