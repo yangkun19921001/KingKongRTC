@@ -39,6 +39,9 @@ namespace kkrtc {
             case KKVideoFormat::ARGB:
                 buffer_size = width * height * 4;
                 break;
+            case KKVideoFormat::NV12:
+                buffer_size = width * height * 3.0/2.0;
+                break;
             default:
                 ////RTC_DCHECK_NOTREACHED();
                 break;
@@ -100,6 +103,8 @@ namespace kkrtc {
                 return libyuv::FOURCC_ARGB;
             case KKVideoFormat::BGRA:
                 return libyuv::FOURCC_BGRA;
+            case KKVideoFormat::NV12:
+                return libyuv::FOURCC_NV12;
         }
         ////RTC_DCHECK_NOTREACHED();
         return libyuv::FOURCC_ANY;

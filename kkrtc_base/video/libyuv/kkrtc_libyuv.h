@@ -127,7 +127,7 @@ namespace kkrtc {
     };
 
 // Convert VideoType to libyuv FourCC type
-    int ConvertVideoType(KKVideoFormat video_type);
+    int ConvertKKVideoFormat(KKVideoFormat video_type);
 
 }//namespace kkrtc
 

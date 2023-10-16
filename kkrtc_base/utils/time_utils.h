@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <time.h>
+#include "kkrtc_export.h"
 
 namespace kkrtc {
     static const int64_t kNumMillisecsPerSec = INT64_C(1000);
@@ -20,5 +21,7 @@ namespace kkrtc {
     static const int64_t kNumNanosecsPerMicrosec =
             kNumNanosecsPerSec / kNumMicrosecsPerSec;
 
+
+    RTC_EXPORT int64_t TimeMillis();
 }//namespace kkrtc
 #endif //KKRTC_TIME_UTILS_H
