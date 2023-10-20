@@ -7,7 +7,7 @@
 
 #include "kkrtc_cap_interface.h"
 #include "video_frame.h"
-#include "kkrtc_video_sink_interface.h"
+#include "video_sink_interface.h"
 #include "dshowcapture.h"
 #include "kkrtc_plugin_log_observer.h"
 
@@ -47,7 +47,7 @@ namespace kkrtc {
             DShow::Device device_;
             DShow::VideoConfig videoConfig_;
             kkrtc::KKLogObserver* log_callback_;
-
+            kkrtc::utils::log::ILogger * raw_logger_;
 
         };
 

@@ -17,8 +17,8 @@ namespace kkrtc {
         class ICapBackend {
         public:
             virtual ~ICapBackend(){}
-            virtual std::shared_ptr<IVideoCapture> createCapture(int camera, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver*logObserver) const = 0;
-            virtual std::shared_ptr<IVideoCapture> createCapture(const std::string &filename, const KKMediaFormat& params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver * logObserver) const = 0;
+            virtual std::shared_ptr<IVideoCapture> createCapture(int camera, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver*logObserver,void*plugin_glob_params) const = 0;
+            virtual std::shared_ptr<IVideoCapture> createCapture(const std::string &filename, const KKMediaFormat& params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver * logObserver,void*plugin_glob_params) const = 0;
         };
 
         class ICapBackendFactory {

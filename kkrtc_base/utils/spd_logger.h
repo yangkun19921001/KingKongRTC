@@ -21,6 +21,7 @@ namespace kkrtc {
                 virtual ~SpdlogLogger();
 
                 SpdlogLogger();
+                SpdlogLogger(std::string module_name);
 
                 virtual void log(LogLevel level,const std::string& tag, const std::string& message) override;
 

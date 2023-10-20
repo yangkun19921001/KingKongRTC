@@ -27,6 +27,7 @@ add_library(kkrtc_base
 set_target_properties(kkrtc_base PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_definitions(-DSPDLOG_HEADER_ONLY)
+add_definitions(-DSPDLOG_NO_EXCEPTIONS)
 target_include_directories(kkrtc_base PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/system
@@ -34,6 +35,7 @@ target_include_directories(kkrtc_base PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/video
         ${CMAKE_CURRENT_SOURCE_DIR}/memory
         ${3RDPARTY_PATH}/libyuv/include
+        ${3RDPARTY_PATH}/abseil-cpp
         ${3RDPARTY_PATH}/spdlog/include
         ${3RDPARTY_PATH}
         ${CMAKE_CURRENT_SOURCE_DIR}/../include

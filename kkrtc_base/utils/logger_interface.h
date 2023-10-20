@@ -34,6 +34,7 @@ namespace kkrtc {
                 bool consoleOutputEnabled_;
                 bool fileOutputEnabled_;
                 std::string filepath_;
+                std::string modulename_;
             public:
                 virtual ~ILogger() = default;
 

@@ -6,6 +6,7 @@
 #include "kkrtc_cap_plugin_api.h"
 #include "kkrtc_std.h"
 #include "kkrtc_plugin_log_observer.h"
+
 namespace kkrtc {
     namespace vcap {
 
@@ -29,13 +30,13 @@ namespace kkrtc {
                             break;
                         if (!kkrtc_cap_api_) {
                             KKLogInfoTag("PluginCapBackend")
-                                    << "Video I/O: plugin is incompatible (can't be initialized): "
-                                    << dynamicLib_->getName();
+                                << "Video CAP: plugin is incompatible (can't be initialized): "
+                                << dynamicLib_->getName();
                             return;
                         }
                     }
                 } else {
-                    KKLogInfoTag("PluginCapBackend") << "Video I/O: missing plugin init function: '" << init_name
+                    KKLogInfoTag("PluginCapBackend") << "Video CAP: missing plugin init function: '" << init_name
                                                      << "', file: "
                                                      << dynamicLib_->getName();
                 }
@@ -52,16 +53,19 @@ namespace kkrtc {
 
             std::shared_ptr<IVideoCapture> createCapture(int camera) const;
 
-            std::shared_ptr<IVideoCapture> createCapture(int camera, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver*logObserver) const override;
+            std::shared_ptr<IVideoCapture>
+            createCapture(int camera, const KKMediaFormat &params, VideoCaptureObserver *capobserver,
+                          kkrtc::KKLogObserver *logObserver,void*plugin_glob_params) const override;
 
             std::shared_ptr<IVideoCapture> createCapture(const std::string &filename) const;
 
             std::shared_ptr<IVideoCapture>
-            createCapture(const std::string &filename, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver*logObserver) const override;
+            createCapture(const std::string &filename, const KKMediaFormat &params, VideoCaptureObserver *capobserver,
+                          kkrtc::KKLogObserver *logObserver,void*plugin_glob_params) const override;
 
         };
 
-    class PluginCapBackendFactory: public ICapBackendFactory {
+        class PluginCapBackendFactory : public ICapBackendFactory {
         public:
             KKVideoCaptureAPIs id_;
             const char *baseName_;
@@ -91,14 +95,13 @@ namespace kkrtc {
             }
 
             void initBackend_() {
-
                 std::lock_guard<std::mutex> lock(getInitializationMutex());
                 try {
                     if (!initialized)
                         loadPlugin();
                 }
                 catch (...) {
-                    KKLogErrorTag("PluginCapBackendFactory") << "Video I/O: exception during plugin loading: "
+                    KKLogErrorTag("PluginCapBackendFactory") << "Video CAP: exception during plugin loading: "
                                                              << baseName_ << ". SKIP";
                 }
                 initialized = true;
@@ -109,8 +112,7 @@ namespace kkrtc {
 
 
         static
-        std::vector<plugin::FileSystemPath_t> getPluginCandidates(const std::string& baseName)
-        {
+        std::vector<plugin::FileSystemPath_t> getPluginCandidates(const std::string &baseName) {
             using namespace kkrtc::utils;
             using namespace kkrtc::utils::fs;
             using namespace plugin;
@@ -120,19 +122,14 @@ namespace kkrtc {
             std::vector<plugin::FileSystemPath_t> paths;
             //todo
             const std::vector<std::string> paths_ /*= getConfigurationParameterPaths("KKRTC_VIDEO_CAP_PLUGIN_PATH", std::vector<std::string>())*/;
-            if (paths_.size() != 0)
-            {
-                for (size_t i = 0; i < paths_.size(); i++)
-                {
+            if (paths_.size() != 0) {
+                for (size_t i = 0; i < paths_.size(); i++) {
                     paths.push_back(plugin::toFileSystemPath(paths_[i]));
                 }
-            }
-            else
-            {
+            } else {
                 FileSystemPath_t binaryLocation;
                 //todo
-                if (getBinLocation(binaryLocation))
-                {
+                if (getBinLocation(binaryLocation)) {
                     binaryLocation = getParent(binaryLocation);
 #ifndef KK_VIDEO_CAP_PLUGIN_SUBDIRECTORY
                     paths.push_back(binaryLocation);
@@ -147,33 +144,32 @@ namespace kkrtc {
 
                 }
             }
-            const std::string default_expr = plugin::libraryPrefix() + "kkrtc_" + baseName_l /*+ "*"*/ + plugin::librarySuffix();
+            const std::string default_expr =
+                    plugin::libraryPrefix() + "kkrtc_" + baseName_l /*+ "*"*/ + plugin::librarySuffix();
             //const std::string default_expr = "win_capture_ds_lib.dll";
             //todo
-           // const std::string plugin_expr /*= getConfigurationParameterString((std::string("KKRTC_VIDEO_CAP_PLUGIN_") + baseName_u).c_str(), default_expr.c_str())*/;
+            // const std::string plugin_expr /*= getConfigurationParameterString((std::string("KKRTC_VIDEO_CAP_PLUGIN_") + baseName_u).c_str(), default_expr.c_str())*/;
             const std::string plugin_expr = default_expr;
             std::vector<plugin::FileSystemPath_t> results;
 #ifdef _WIN32
-            plugin::FileSystemPath_t moduleName = plugin::toFileSystemPath(plugin::libraryPrefix() + "kkrtc_" + baseName_l + plugin::librarySuffix());
+            plugin::FileSystemPath_t moduleName = plugin::toFileSystemPath(
+                    plugin::libraryPrefix() + "kkrtc_" + baseName_l + plugin::librarySuffix());
             //plugin::FileSystemPath_t moduleName  = plugin::toFileSystemPath("win_capture_ds_lib.dll");
 
 #ifndef WINRT
             if (baseName_u == "FFMPEG")  // backward compatibility
             {
-                const wchar_t* ffmpeg_env_path = _wgetenv(L"KKRTC_FFMPEG_DLL_DIR");
-                if (ffmpeg_env_path)
-                {
+                const wchar_t *ffmpeg_env_path = _wgetenv(L"KKRTC_FFMPEG_DLL_DIR");
+                if (ffmpeg_env_path) {
                     results.push_back(plugin::FileSystemPath_t(ffmpeg_env_path) + L"\\" + moduleName);
                 }
             }
 #endif
-            if (plugin_expr != default_expr)
-            {
+            if (plugin_expr != default_expr) {
                 moduleName = plugin::toFileSystemPath(plugin_expr);
                 results.push_back(moduleName);
             }
-            for (const plugin::FileSystemPath_t& path : paths)
-            {
+            for (const plugin::FileSystemPath_t &path: paths) {
                 results.push_back(path + L"\\" + moduleName);
             }
 
@@ -191,102 +187,113 @@ namespace kkrtc {
     }
 #endif // _DEBUG && DEBUG_POSTFIX
 #else
-      KKLogInfoTag("kkrtc_cap_backend_plugin")<< "VideoIO plugin (" << baseName << "): glob is '" << plugin_expr << "', " << paths.size() << " location(s)";
-    for (const std::string& path : paths)
-    {
-        if (path.empty())
-            continue;
-        std::vector<std::string> candidates;
-        cv::glob(utils::fs::join(path, plugin_expr), candidates);
-        // Prefer candisates with higher versions
-        // TODO: implemented accurate versions-based comparator
-        std::sort(candidates.begin(), candidates.end(), std::greater<std::string>());
-        KKLogInfoTag("kkrtc_cap_backend_plugin")<< "    - " << path << ": " << candidates.size());
-        copy(candidates.begin(), candidates.end(), back_inserter(results));
-    }
+            KKLogInfoTag("kkrtc_cap_backend_plugin")<< "VideoIO plugin (" << baseName << "): glob is '" << plugin_expr << "', " << paths.size() << " location(s)";
+          for (const std::string& path : paths)
+          {
+              if (path.empty())
+                  continue;
+              std::vector<std::string> candidates;
+              cv::glob(utils::fs::join(path, plugin_expr), candidates);
+              // Prefer candisates with higher versions
+              // TODO: implemented accurate versions-based comparator
+              std::sort(candidates.begin(), candidates.end(), std::greater<std::string>());
+              KKLogInfoTag("kkrtc_cap_backend_plugin")<< "    - " << path << ": " << candidates.size());
+              copy(candidates.begin(), candidates.end(), back_inserter(results));
+          }
 #endif
-            KKLogInfoTag("kkrtc_cap_backend_plugin")<<"Found " << results.size() << " plugin(s) for " << baseName;
+            KKLogInfoTag("kkrtc_cap_backend_plugin") << "Found " << results.size() << " plugin(s) for " << baseName;
             return results;
         }
 
         void PluginCapBackendFactory::loadPlugin() {
 
-            for (const plugin::FileSystemPath_t& plugin : getPluginCandidates(baseName_))
-            {
+            for (const plugin::FileSystemPath_t &plugin: getPluginCandidates(baseName_)) {
                 auto lib = makePtr<kkrtc::plugin::DynamicLib>(plugin);
                 if (!lib->isLoaded())
                     continue;
-                try
-                {
+                try {
                     KKPtr<PluginCapBackend> pluginBackend = makePtr<PluginCapBackend>(lib);
                     if (!pluginBackend)
                         return;
                     if (pluginBackend->kkrtc_cap_api_ == NULL
-                       )
-                    {
-                        KKLogErrorTag("kkrtc_cap_backend_plugin")<< "pluginBackend->kkrtc_cap_api null";
+                            ) {
+                        KKLogErrorTag("kkrtc_cap_backend_plugin") << "pluginBackend->kkrtc_cap_api null";
                         return;
                     }
                     backend = pluginBackend;
                     return;
                 }
-                catch (...)
-                {
-                    KKLogWarnTag("kkrtc_cap_backend_plugin")<< "Video I/O: exception during plugin initialization: " << plugin::toPrintablePath(plugin) << ". SKIP";
+                catch (...) {
+                    KKLogWarnTag("kkrtc_cap_backend_plugin") << "Video CAP: exception during plugin initialization: "
+                                                             << plugin::toPrintablePath(plugin) << ". SKIP";
                 }
             }
         }
 
-        class PluginCapture : public kkrtc::vcap::IVideoCapture
-        {
-            const KKVideoCapturePluginAPI * cap_plugin_api_;
+        class PluginCapture : public kkrtc::vcap::IVideoCapture {
+            const KKVideoCapturePluginAPI *cap_plugin_api_;
+            KKPtr<kkrtc::PluginGlobParam_t *> plugin_glob_param_;
             KkPluginCapture kk_capture_;
         public:
-            ~PluginCapture(){
-                if (0 != cap_plugin_api_->capture_release(kk_capture_))
-                {
-                    KKLogErrorTag("kkrtc_cap_backend_plugin")<<"Video I/O: Can't release capture by plugin '";
+            ~PluginCapture() {
+                if (0 != cap_plugin_api_->capture_release(kk_capture_)) {
+                    KKLogErrorTag("kkrtc_cap_backend_plugin") << "Video CAP: Can't release capture by plugin '";
 
                 };
                 kk_capture_ = nullptr;
+                if (!plugin_glob_param_.empty()) {
+                    plugin_glob_param_.release();
+                }
             }
-             void Initialize(const kkrtc::KKMediaFormat& mediaFormats) override {
+
+            void Initialize(const kkrtc::KKMediaFormat &mediaFormats) override {
 
             };
-             bool IsOpened() const override{
-                 return kk_capture_ != nullptr;
-             };
 
-            const KKMediaFormat& GetMediaFormats() const override{
+            bool IsOpened() const override {
+                return kk_capture_ != nullptr;
+            };
+
+            const KKMediaFormat &GetMediaFormats() const override {
 
                 return KKMediaFormat();
             }
 
-            int GetCapDomain() const override{ return cap_plugin_api_->cap_id; }
+            int GetCapDomain() const override { return cap_plugin_api_->cap_id; }
 
-            PluginCapture(const KKVideoCapturePluginAPI* cap_plugin_api, KkPluginCapture kk_capture)
-                    : cap_plugin_api_(cap_plugin_api), kk_capture_(kk_capture)
-            {
-                assert(cap_plugin_api_); assert(kk_capture_);
+            PluginCapture(const KKVideoCapturePluginAPI *cap_plugin_api, KkPluginCapture kk_capture)
+                    : cap_plugin_api_(cap_plugin_api), kk_capture_(kk_capture) {
+                assert(cap_plugin_api_);
+                assert(kk_capture_);
             }
-            static std::shared_ptr<PluginCapture> create(const KKVideoCapturePluginAPI * cap_plugin_api,
-                                                         const std::string &filename, int camera, const KKMediaFormat &mediaFormat,VideoCaptureObserver * captureObserver,kkrtc::KKLogObserver * kkLogObserver){
+
+            static std::shared_ptr<PluginCapture> create(const KKVideoCapturePluginAPI *cap_plugin_api,
+                                                         const std::string &filename, int camera,
+                                                         const KKMediaFormat &mediaFormat,
+                                                         VideoCaptureObserver *captureObserver,
+                                                         kkrtc::KKLogObserver *kkLogObserver,
+                                                         void *plugin_glob_params) {
                 assert(cap_plugin_api);
                 KkPluginCapture kk_capture = nullptr;
 
                 std::vector<int> vint_params = mediaFormat.getIntVector();
-                int* c_params = vint_params.data();
-                unsigned n_params = (unsigned)(vint_params.size() / 2);
-
-                if (cap_plugin_api->capture_initialize(&kk_capture) != 0)
-                {
-                    KKLogErrorTag("video-cap") << cap_plugin_api<<" capture_initialize error.";
+                int *c_params = vint_params.data();
+                unsigned n_params = (unsigned) (vint_params.size() / 2);
+                if (cap_plugin_api->capture_initialize(&kk_capture,plugin_glob_params) != 0) {
+                    KKLogErrorTag("video-cap") << " capture_initialize error.";
                     return nullptr;
                 }
-                cap_plugin_api->set_log_callback(kk_capture,kkLogObserver);
-                cap_plugin_api->set_video_callback(kk_capture,captureObserver);
-                if (0 == cap_plugin_api->capture_open_with_params(kk_capture,camera,filename.empty() ? 0 : filename.c_str(),c_params,n_params))
-                {
+
+                if (cap_plugin_api->set_log_callback(kk_capture, kkLogObserver) != 0) {
+                    KKLogErrorTag("video-cap") << " set_log_callback error.";
+                }
+
+                if (cap_plugin_api->set_video_callback(kk_capture, captureObserver) != 0) {
+                    KKLogErrorTag("video-cap") << " set_video_callback error.";
+                }
+                if (0 == cap_plugin_api->capture_open_with_params(kk_capture, camera,
+                                                                  filename.empty() ? 0 : filename.c_str(), c_params,
+                                                                  n_params)) {
                     assert(kk_capture);
                     return makePtr<PluginCapture>(cap_plugin_api, kk_capture);;
                 }
@@ -294,16 +301,17 @@ namespace kkrtc {
             }
         };
 
-        std::shared_ptr<IVideoCapture> PluginCapBackend::createCapture(int camera, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver*logObserver) const {
-            try
-            {
-            if (kkrtc_cap_api_){
-                return PluginCapture::create(kkrtc_cap_api_,std::string(),camera,params,capobserver,logObserver);
+        std::shared_ptr<IVideoCapture>
+        PluginCapBackend::createCapture(int camera, const KKMediaFormat &params, VideoCaptureObserver *capobserver,
+                                        kkrtc::KKLogObserver *logObserver, void *plugin_glob_params) const {
+            try {
+                if (kkrtc_cap_api_) {
+                    return PluginCapture::create(kkrtc_cap_api_, std::string(), camera, params, capobserver,
+                                                 logObserver,plugin_glob_params);
+                }
             }
-            }
-            catch (...)
-            {
-                KKLogErrorTag("kkrtc_cap_backend_plugin")<<"Video I/O: can't create camera capture: " << camera;
+            catch (...) {
+                KKLogErrorTag("kkrtc_cap_backend_plugin") << "Video CAP: can't create camera capture: " << camera;
                 throw;
             }
             return KKPtr<IVideoCapture>();
@@ -318,23 +326,22 @@ namespace kkrtc {
         }
 
         std::shared_ptr<IVideoCapture>
-        PluginCapBackend::createCapture(const std::string &filename, const KKMediaFormat &params,VideoCaptureObserver *capobserver,kkrtc::KKLogObserver * logObserver) const {
-            try
-            {
-                if (kkrtc_cap_api_){
-                    return PluginCapture::create(kkrtc_cap_api_,filename,0,params,capobserver,logObserver);
+        PluginCapBackend::createCapture(const std::string &filename, const KKMediaFormat &params,
+                                        VideoCaptureObserver *capobserver, kkrtc::KKLogObserver *logObserver,void*plugin_glob_params) const {
+            try {
+                if (kkrtc_cap_api_) {
+                    return PluginCapture::create(kkrtc_cap_api_, filename, 0, params, capobserver, logObserver,plugin_glob_params);
                 }
             }
-            catch (...)
-            {
-                KKLogErrorTag("kkrtc_cap_backend_plugin")<<"Video I/O:can't open file capture: " << filename;
+            catch (...) {
+                KKLogErrorTag("kkrtc_cap_backend_plugin") << "Video CAP:can't open file capture: " << filename;
                 throw;
             }
             return std::shared_ptr<IVideoCapture>();
         }
 
 
-        KKPtr<ICapBackendFactory> createPluginBackendFactory(KKVideoCaptureAPIs id, const char* baseName){
+        KKPtr<ICapBackendFactory> createPluginBackendFactory(KKVideoCaptureAPIs id, const char *baseName) {
 #if KKRTC_HAVE_FILESYSTEM_SUPPORT && defined(ENABLE_PLUGINS)
             return makePtr<PluginCapBackendFactory>(id, baseName); //.staticCast<IBackendFactory>();
 #else

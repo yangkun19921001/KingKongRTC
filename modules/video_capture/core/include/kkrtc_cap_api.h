@@ -9,14 +9,14 @@
 #include "kkrtc_std.h"
 #include "kkrtc_cap_interface.h"
 #include "kkrtc_plugin_log_observer.h"
-
+#include "kkrtc_plugin_params.h"
 namespace kkrtc {
     namespace vcap {
         /**
         * @brief VideoCapture 类提供一个用于捕获视频数据的接口。
         * 它支持使用各种API从文件和设备打开视频。
         */
-        class VideoCapture : public VideoCaptureObserver, kkrtc::KKLogObserver {
+        class VideoCapture : public VideoCaptureObserver, kkrtc::KKLogObserver, VideoCaptureModule {
         public:
             /**
              * @brief VideoCapture 的默认构造函数。
@@ -84,6 +84,18 @@ namespace kkrtc {
             virtual void IncomingFrame(uint8_t *videoFrame,
                                        size_t videoFrameLength,
                                        const KKVideoCapConfig &frame, int64_t captureTime = 0);
+
+            // Call backs
+            virtual void RegisterCaptureDataCallback(
+                    kkrtc::VideoSinkInterface<VideoFrame> *dataCallback) override;
+
+            virtual void DeRegisterCaptureDataCallback() override;
+
+        private:
+            int32_t DeliverCapturedFrame(VideoFrame& captureFrame);
+            std::mutex cap_lock_;
+            kkrtc::VideoSinkInterface<VideoFrame> *dataCallback_;
+            KKPtr<kkrtc::PluginGlobParam_t> plugin_glob_params_;
 
         protected:
             /**

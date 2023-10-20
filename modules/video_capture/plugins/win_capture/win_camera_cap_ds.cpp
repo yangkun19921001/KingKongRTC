@@ -12,7 +12,7 @@
 #include <codecvt>
 #include "kkrtc_plugin_log_observer.h"
 
-const char * plugin_name = "PLUGIN-DSHOW";
+const char *plugin_name = "PLUGIN-DSHOW";
 
 namespace kkrtc {
     namespace vcap {
@@ -46,16 +46,16 @@ namespace kkrtc {
             auto callback = (kkrtc::KKLogObserver *) param;
             switch (type) {
                 case DShow::LogType::Error:
-                    PLUGIN_LOG_ERR(plugin_name,msg, callback);
+                    PLUGIN_LOG_ERR(plugin_name, msg, callback);
                     break;
                 case DShow::LogType::Warning:
-                    PLUGIN_LOG_WARN(plugin_name,msg, callback);
+                    PLUGIN_LOG_WARN(plugin_name, msg, callback);
                     break;
                 case DShow::LogType::Debug:
-                    PLUGIN_LOG_DEBUG(plugin_name,msg, callback);
+                    PLUGIN_LOG_DEBUG(plugin_name, msg, callback);
                     break;
                 case DShow::LogType::Info:
-                    PLUGIN_LOG_INFO(plugin_name,msg, callback);
+                    PLUGIN_LOG_INFO(plugin_name, msg, callback);
                     break;
             }
         }
@@ -90,7 +90,8 @@ namespace kkrtc {
                         m_auto_focus = mediaFormats.get<bool>(KK_CAP_PROP_AUTOFOCUS);
                         break;
                     default: {
-                        PLUGIN_LOG_WARN(plugin_name,std::format("format not used:{}", mediaFormats.getIntVector()[i]).c_str(),
+                        PLUGIN_LOG_WARN(plugin_name,
+                                        std::format("format not used:{}", mediaFormats.getIntVector()[i]).c_str(),
                                         this->log_callback_);
                         break;
                     }
@@ -166,7 +167,7 @@ namespace kkrtc {
         int WinCameraCaptureDS::Open(int index) {
             Close();
             if (!device_.ResetGraph()) {
-                PLUGIN_LOG_ERR(plugin_name,std::format("ResetGraph error"
+                PLUGIN_LOG_ERR(plugin_name, std::format("ResetGraph error"
                 ).c_str(), this->log_callback_)
                 return false;
             }
@@ -174,7 +175,7 @@ namespace kkrtc {
             DShow::Device::EnumVideoDevices(devices);
 
             if (devices.size() == 0 || devices.size() < m_camera_index_ + 1) {
-                PLUGIN_LOG_ERR(plugin_name,std::format("devices size:{}", devices.size()
+                PLUGIN_LOG_ERR(plugin_name, std::format("devices size:{}", devices.size()
                 ).c_str(), this->log_callback_)
                 return false;
             }
@@ -205,14 +206,14 @@ namespace kkrtc {
                                               std::placeholders::_5, std::placeholders::_6);
             device_.SetVideoConfig(&videoConfig_);
             if (!device_.ConnectFilters()) {
-                PLUGIN_LOG_ERR(plugin_name,std::format("ConnectFilters error"
+                PLUGIN_LOG_ERR(plugin_name, std::format("ConnectFilters error"
                 ).c_str(), this->log_callback_)
                 return false;
             }
 
 
             if (device_.Start() != DShow::Result::Success) {
-                PLUGIN_LOG_ERR(plugin_name,std::format("Start error"
+                PLUGIN_LOG_ERR(plugin_name, std::format("Start error"
                 ).c_str(), this->log_callback_)
                 return false;
             }
@@ -231,12 +232,26 @@ namespace kkrtc {
 }//kkrtc
 
 
-static int kkrtc_capture_initialize(KkPluginCapture *handle) {
+static int kkrtc_capture_initialize(KkPluginCapture *handle, void *param) {
     *handle = nullptr;
     kkrtc::vcap::WinCameraCaptureDS *win_cap_ds = nullptr;
     win_cap_ds = new kkrtc::vcap::WinCameraCaptureDS();
     if (win_cap_ds) {
         *handle = (KkPluginCapture) win_cap_ds;
+        if (param) {
+            auto plugParam = static_cast<kkrtc::PluginGlobParam_t *>(param);
+            if (plugParam->glob_logger) {
+/*                auto globalLogger_ = static_cast<kkrtc::utils::log::ILogger *>(plugParam->glob_logger);
+                auto logger = kkrtc::utils::log::LoggerFactory::createLogger(kkrtc::utils::log::LoggerId::SPDLOG,
+                                                                             "DSHOW");
+                logger->setLogLevel(globalLogger_->logLevel_);
+                logger->setFileOutput(globalLogger_->fileOutputEnabled_, globalLogger_->filepath_);
+                logger->setConsoleOutput(globalLogger_->consoleOutputEnabled_);
+                //KKLogConfig_InitPluginLogger(static_cast<kkrtc::utils::log::ILogger*>(plugParam->glob_logger))
+                KKLogConfig_InitGlobLogger(logger)
+                KKLogInfoTag("DSHOW") << "initialize logger succeed.";*/
+            }
+        }
         return 0;
     }
     return -1;
@@ -253,7 +268,7 @@ int kkrtc_capture_open_with_params(KkPluginCapture handle, int camera_index, con
         win_cap_ds->Initialize(parameters);
         int ret = win_cap_ds->Open(camera_index);
         if (ret != 0) {
-            PLUGIN_LOG_ERR(plugin_name,std::format("WIN_DSHOW Open Error:{}", camera_index
+            PLUGIN_LOG_ERR(plugin_name, std::format("WIN_DSHOW Open Error:{}", camera_index
             ).c_str(), win_cap_ds->log_callback_)
         }
         if (win_cap_ds->IsOpened()) {
@@ -262,10 +277,10 @@ int kkrtc_capture_open_with_params(KkPluginCapture handle, int camera_index, con
         }
         return -1;
     } catch (const std::exception &e) {
-        PLUGIN_LOG_ERR(plugin_name,std::format("DirectShow: Exception is raised:{}", e.what()
+        PLUGIN_LOG_ERR(plugin_name, std::format("DirectShow: Exception is raised:{}", e.what()
         ).c_str(), win_cap_ds->log_callback_)
     } catch (...) {
-        PLUGIN_LOG_ERR(plugin_name,std::format("DirectShow: Unknown C++ exception is raised"
+        PLUGIN_LOG_ERR(plugin_name, std::format("DirectShow: Unknown C++ exception is raised"
         ).c_str(), win_cap_ds->log_callback_)
     }
 

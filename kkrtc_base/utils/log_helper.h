@@ -9,11 +9,14 @@
 #include "kkrtc_std_wrapper.h"
 
 void InitGlobLogger(kkrtc::KKPtr<kkrtc::utils::log::ILogger> logger);
+void InitPluginLogger(kkrtc::KKPtr<kkrtc::utils::log::ILogger> logger);
 
 kkrtc::KKPtr<kkrtc::utils::log::ILogger> GetGlobLogger();
 
 #define globalLogger GetGlobLogger()
 #define KKLogConfig_InitGlobLogger(logger) InitGlobLogger(logger);
+#define KKLogConfig_InitPluginLogger(logger) InitPluginLogger(logger);
+#define KKLogConfig_ReleaseGlobLogger() if(!globalLogger.empty()) globalLogger.release();
 #define KKLogConfig_SetLogLevel(level) if(globalLogger.empty()) std::cout << "Error: globalLogger not init." <<std::endl; else globalLogger->setLogLevel(level);
 #define KKLogConfig_SetConsoleOutput(enable) if(!globalLogger) std::cout << "Error: globalLogger not init." <<std::endl; else  globalLogger->setConsoleOutput(enable);
 #define KKLogConfig_SetFileOutput(enable, filepath)  if(!globalLogger) std::cout << "Error: globalLogger not init." <<std::endl; else globalLogger->setFileOutput(enable,filepath);

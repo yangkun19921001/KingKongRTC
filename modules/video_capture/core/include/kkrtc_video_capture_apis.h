@@ -34,6 +34,8 @@ namespace kkrtc {
             int32_t height;
             int32_t maxFPS;
             int32_t rotation;
+            int cropWidth;
+            int cropHeight;
             kkrtc::KKVideoFormat videoType;
             bool interlaced;
 
@@ -41,6 +43,9 @@ namespace kkrtc {
                 width = 0;
                 height = 0;
                 maxFPS = 0;
+                rotation = 0;
+                cropWidth = 0;
+                cropHeight = 0;
                 rotation = 0;
                 videoType = kkrtc::KKVideoFormat::Unknown;
                 interlaced = false;
@@ -57,6 +62,10 @@ namespace kkrtc {
                 if (interlaced != other.interlaced)
                     return true;
                 if (rotation != other.rotation)
+                    return true;
+                if (cropWidth != other.cropWidth)
+                    return true;
+                if (cropHeight != other.cropHeight)
                     return true;
                 return false;
             }

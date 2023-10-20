@@ -3,7 +3,6 @@
 //
 #include <iostream>
 #include "kkrtc_cap_api.h"
-
 int main(int argc,char**arg){
     KKLogConfig_InitGlobLogger(kkrtc::utils::log::LoggerFactory::createLogger(kkrtc::utils::log::LoggerId::SPDLOG));
     KKLogConfig_SetLogLevel(kkrtc::utils::log::LogLevel::TRACE);

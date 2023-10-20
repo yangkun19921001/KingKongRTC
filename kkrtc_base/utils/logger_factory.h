@@ -60,6 +60,15 @@ namespace kkrtc {
                     }
                     return makePtr<SpdlogLogger>();
                 };
+                static KKPtr<ILogger> createLogger(LoggerId id,std::string modulename) {
+                    switch (id) {
+                        case LoggerId::NONE:
+                            return makePtr<DefLogger>();
+                        case LoggerId::SPDLOG:
+                            return makePtr<SpdlogLogger>(modulename);
+                    }
+                    return makePtr<SpdlogLogger>();
+                };
             };
 
         }

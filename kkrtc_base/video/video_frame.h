@@ -15,6 +15,7 @@
 #include "memory/scoped_refptr.h"
 #include "video_frame_buffer.h"
 #include "video_rotation.h"
+#include "absl/types/optional.h"
 
 namespace kkrtc {
     class RTC_EXPORT VideoFrame {
@@ -195,6 +196,18 @@ namespace kkrtc {
             return video_frame_buffer()->type() == VideoFrameBuffer::Type::kNative;
         }
 
+        bool has_update_rect() const { return update_rect_.has_value(); }
+
+        // Rectangle must be within the frame dimensions.
+        void set_update_rect(const VideoFrame::UpdateRect& update_rect) {
+          /*  RTC_DCHECK_GE(update_rect.offset_x, 0);
+            RTC_DCHECK_GE(update_rect.offset_y, 0);
+            RTC_DCHECK_LE(update_rect.offset_x + update_rect.width, width());
+            RTC_DCHECK_LE(update_rect.offset_y + update_rect.height, height());*/
+            update_rect_ = update_rect;
+        }
+
+        void clear_update_rect() { update_rect_ = absl::nullopt; }
 
     private:
         VideoFrame(uint16_t id,
@@ -212,7 +225,8 @@ namespace kkrtc {
         int64_t ntp_time_ms_;
         int64_t timestamp_us_;
         VideoRotation rotation_;
-
+        absl::optional<int32_t> max_composition_delay_in_frames_;
+        absl::optional<UpdateRect> update_rect_;
     };
 
 }//namespace KKRTC

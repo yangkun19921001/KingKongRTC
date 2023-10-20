@@ -13,19 +13,24 @@
 namespace kkrtc {
     namespace vcap {
 
-        VideoCapture::VideoCapture() {
+        VideoCapture::VideoCapture() : dataCallback_(nullptr), plugin_glob_params_(nullptr), cap_(nullptr) {
 
         }
 
         VideoCapture::~VideoCapture() {
-
+            DeRegisterCaptureDataCallback();
+            release();
         }
 
-        VideoCapture::VideoCapture(int index, int apiPreference, const KKMediaFormat &params) {
+        VideoCapture::VideoCapture(int index, int apiPreference, const KKMediaFormat &params) : dataCallback_(nullptr),
+                                                                                                plugin_glob_params_(
+                                                                                                        nullptr),
+                                                                                                cap_(nullptr) {
             open(index, apiPreference, params);
         }
 
-        VideoCapture::VideoCapture(const String &filename, int apiPreference, const KKMediaFormat &params) {
+        VideoCapture::VideoCapture(const String &filename, int apiPreference, const KKMediaFormat &params)
+                : dataCallback_(nullptr), plugin_glob_params_(nullptr), cap_(nullptr) {
             open(filename, apiPreference, params);
         }
 
@@ -48,13 +53,17 @@ namespace kkrtc {
                     }
 
                     KKLogDebugTag("kkrtc_cap_api") <<
-                                                   std::format("VIDEO CAP(%s): trying capture cameraNum=%d ...",
+                                                   std::format("VIDEO CAP{}: trying capture cameraNum={} ...",
                                                                info.name, index);
                     assert(!info.capBackendFactory.empty());
                     const KKPtr<ICapBackend> backend = info.capBackendFactory->getBackend();
                     if (!backend.empty()) {
                         try {
-                            cap_ = backend->createCapture(index, params, this, this);
+                            plugin_glob_params_ = makePtr<kkrtc::PluginGlobParam_t>();
+                            plugin_glob_params_->glob_logger = GetGlobLogger();
+
+                            cap_ = backend->createCapture(index, params, this, this,
+                                                          (void *) plugin_glob_params_.get());
                             if (!cap_.empty()) {
                                 if (cap_->IsOpened()) {
                                     return true;
@@ -89,16 +98,22 @@ namespace kkrtc {
         }
 
         void VideoCapture::release() {
-            cap_.release();
+            if (!cap_.empty())
+                cap_.release();
+            if (!plugin_glob_params_.empty())
+                plugin_glob_params_.release();
+            cap_ = nullptr;
+            plugin_glob_params_ = nullptr;
         }
 
         void
         VideoCapture::IncomingFrame(uint8_t *videoFrame, size_t videoFrameLength, const KKVideoCapConfig &frameInfo,
                                     int64_t captureTime) {
-            KKLogDebugTag("IncomingFrame") << frameInfo.width << ":" << frameInfo.height << " format:"
+            std::lock_guard<std::mutex> lock(cap_lock_);
+/*            KKLogDebugTag("IncomingFrame") << frameInfo.width << ":" << frameInfo.height << " format:"
                                            << (int) frameInfo.videoType
                                            << "  fps:" << (int) frameInfo.maxFPS
-                                           << "  startTime:" << captureTime;
+                                           << "  startTime:" << captureTime;*/
 
             const int32_t width = frameInfo.width;
             const int32_t height = frameInfo.height;
@@ -149,7 +164,7 @@ namespace kkrtc {
                     videoFrame, videoFrameLength, buffer.get()->MutableDataY(),
                     buffer.get()->StrideY(), buffer.get()->MutableDataU(),
                     buffer.get()->StrideU(), buffer.get()->MutableDataV(),
-                    buffer.get()->StrideV(), 0, 0,  // No Cropping
+                    buffer.get()->StrideV(), frameInfo.cropWidth, frameInfo.cropHeight,  // No Cropping
                     width, height, target_width, target_height, rotation_mode,
                     kkrtc::ConvertKKVideoFormat(frameInfo.videoType));
 
@@ -167,6 +182,26 @@ namespace kkrtc {
                             .set_rotation(!apply_rotation ? (VideoRotation) frameInfo.rotation : kVideoRotation_0)
                             .build();
             captureFrame.set_ntp_time_ms(captureTime);
+
+            DeliverCapturedFrame(captureFrame);
+        }
+
+        void VideoCapture::RegisterCaptureDataCallback(kkrtc::VideoSinkInterface<VideoFrame> *dataCallback) {
+            std::lock_guard<std::mutex> lock(cap_lock_);
+            this->dataCallback_ = dataCallback;
+        }
+
+        void VideoCapture::DeRegisterCaptureDataCallback() {
+            std::lock_guard<std::mutex> lock(cap_lock_);
+            this->dataCallback_ = nullptr;
+        }
+
+        int32_t VideoCapture::DeliverCapturedFrame(VideoFrame &captureFrame) {
+            if (this->dataCallback_) {
+                this->dataCallback_->OnFrame(captureFrame);
+                return 0;
+            }
+            return -1;
         }
     }// namespace vcap
 }// namespace kkrtc
