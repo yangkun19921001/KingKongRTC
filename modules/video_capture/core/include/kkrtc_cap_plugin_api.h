@@ -28,13 +28,7 @@
 
 #endif // !defined(BUILD_PLUGIN)
 
-#ifndef KK_PLUGIN_EXPORTS
-#if (defined _WIN32 || defined WINCE || defined __CYGWIN__)
-#  define KK_PLUGIN_EXPORTS __declspec(dllexport)
-#elif defined __GNUC__ && __GNUC__ >= 4
-#  define KK_PLUGIN_EXPORTS __attribute__ ((visibility ("default")))
-#endif
-#endif
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +43,7 @@ typedef struct KKVideoCaptureAPI {
     *  初始化
     *  @param
     *  handle：采集句柄
-    *  camera_index:摄像头索引
+    *  param:全局参数
     * */
     int (*capture_initialize)(KkPluginCapture *handle,void *param);
 

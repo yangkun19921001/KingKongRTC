@@ -18,6 +18,7 @@
 
 #include "log_helper.h"
 #include "version.h"
+
 namespace kkrtc {
     namespace plugin {
 
@@ -107,15 +108,15 @@ namespace kkrtc {
         std::string librarySuffix() {
 #if defined(_WIN32)
             const char *suffix = ""
-/*                                 KKAUX_STR(KKRTC_MAJOR_VERSION)
-                                 KKAUX_STR(KKRTC_MINOR_VERSION)
-                                 KKAUX_STR(KKRTC_PATCH_VERSION)
-                                 #if (defined _MSC_VER && defined _M_X64) || (defined __GNUC__ && defined __x86_64__)
-                                 "_64"
-                                 #endif
-                                 #if defined(_DEBUG) && defined(DEBUG_POSTFIX)
-                                 CVAUX_STR(DEBUG_POSTFIX)
-                                 #endif*/
+                                 /*                                 KKAUX_STR(KKRTC_MAJOR_VERSION)
+                                                                  KKAUX_STR(KKRTC_MINOR_VERSION)
+                                                                  KKAUX_STR(KKRTC_PATCH_VERSION)
+                                                                  #if (defined _MSC_VER && defined _M_X64) || (defined __GNUC__ && defined __x86_64__)
+                                                                  "_64"
+                                                                  #endif
+                                                                  #if defined(_DEBUG) && defined(DEBUG_POSTFIX)
+                                                                  CVAUX_STR(DEBUG_POSTFIX)
+                                                                  #endif*/
                                  ".dll";
             return suffix;
 #else
@@ -156,6 +157,7 @@ namespace kkrtc {
 
             DynamicLib &operator=(const DynamicLib &) = delete;
         };
+        std::vector<plugin::FileSystemPath_t> getPluginCandidates(const std::string &baseName);
     }//plugin
 }//kkrtc
 

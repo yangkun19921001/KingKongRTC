@@ -26,9 +26,6 @@ namespace kkrtc {
             const char *name;
             KKPtr <ICapBackendFactory> capBackendFactory;
         };
-
-
-
     }
 
     namespace vcap_registry {

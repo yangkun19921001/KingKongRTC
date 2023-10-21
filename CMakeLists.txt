@@ -119,7 +119,7 @@ add_definitions(
 set(kkrtc_libs)
 set(kkrtc_base)
 set(3RDPARTY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
-
+set(ABSL_PROPAGATE_CXX_STD ON)
 add_subdirectory(${3RDPARTY_PATH}/abseil-cpp)
 
 add_subdirectory(api)

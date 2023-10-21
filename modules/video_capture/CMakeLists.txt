@@ -1,13 +1,3 @@
-# 设置公共路径
-#[[set(VIDEO_CAPTURE_INCLUDE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/core/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/../core
-        )
-
-set(VIDEO_CAPTURE_SRC_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/core/src
-        )]]
-
 file(GLOB kkrtc_video_cap_core_hdrs
         ${CMAKE_CURRENT_SOURCE_DIR}/core/include/*.h
         )
