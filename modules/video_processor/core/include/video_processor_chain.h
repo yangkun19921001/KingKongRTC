@@ -21,10 +21,11 @@ namespace kkrtc {
                     processors.push_back(std::move(processor));
                 }
 
-                void process(VideoFrame &data) {
+                bool process(VideoFrame &data) {
                     for (auto &processor: processors) {
                         processor->Process(data);
                     }
+                    return true;
                 }
             };
         }

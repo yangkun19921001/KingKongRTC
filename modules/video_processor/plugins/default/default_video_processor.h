@@ -9,6 +9,8 @@
 #include "kkrtc_plugin_log_observer.h"
 #include "core/include/video_processor_plugin_apis.h"
 #include "core/include/video_processor_plugin_api.h"
+#include "core/include/video_processor_chain.h"
+
 
 namespace kkrtc {
     namespace plugin {
@@ -51,16 +53,17 @@ namespace kkrtc {
                  */
                 const KKMediaFormat &GetMediaFormats() const override;
 
+                void SetLogCallback(KKLogObserver *pObserver);
             public:
                 kkrtc::KKLogObserver *log_callback_;
                 kkrtc::utils::log::ILogger *raw_logger_;
                 int64_t frames_;
                 KKMediaFormat media_format_;
+                kkrtc::vpro::plugin::VideoProcessorChain video_processor_chain_;
 
-                void SetLogCallback(KKLogObserver *pObserver);
             };
         }//def
-    }//plugin
+    }//plugins
 }//kkrtc
 
 

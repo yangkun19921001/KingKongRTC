@@ -29,12 +29,12 @@ namespace kkrtc {
                         if (kkrtc_cap_api_)
                             break;
                         KKLogInfoTag("VideoProcessorPlusinBackend")
-                            << "Video Processor: plugin is incompatible (can't be initialized): "
+                            << "Video Processor: plugins is incompatible (can't be initialized): "
                             << dynamicLib_->getName();
                         return;
                     }
                 } else {
-                    KKLogInfoTag("VideoProcessorPlusinBackend") << "Video Processor: missing plugin init function: '"
+                    KKLogInfoTag("VideoProcessorPlusinBackend") << "Video Processor: missing plugins init function: '"
                                                                 << init_name
                                                                 << "', file: "
                                                                 << dynamicLib_->getName();
@@ -92,7 +92,7 @@ namespace kkrtc {
                 }
                 catch (...) {
                     KKLogErrorTag("VideoProcessorPluginBackendFactory")
-                        << "Video Processor: exception during plugin loading: "
+                        << "Video Processor: exception during plugins loading: "
                         << baseName_ << ". SKIP";
                 }
                 initialized_ = true;
@@ -120,7 +120,7 @@ namespace kkrtc {
                 }
                 catch (...) {
                     KKLogWarnTag("VideoProcessorPlusinBackend")
-                        << "Video Processor: exception during plugin initialization: "
+                        << "Video Processor: exception during plugins initialization: "
                         << plugin::toPrintablePath(plugin) << ". SKIP";
                 }
             }
@@ -134,7 +134,7 @@ namespace kkrtc {
             ~VideoProcessorPlugin() {
                 if (video_processor_plugin_api->release != nullptr &&
                     0 != video_processor_plugin_api->release(kk_video_pro_)) {
-                    KKLogErrorTag("VideoProcessorPlugin") << "Video PRO: Can't release capture by plugin '";
+                    KKLogErrorTag("VideoProcessorPlugin") << "Video PRO: Can't release capture by plugins '";
 
                 };
                 kk_video_pro_ = nullptr;

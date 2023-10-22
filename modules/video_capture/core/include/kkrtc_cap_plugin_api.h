@@ -10,14 +10,14 @@
 #if !defined(BUILD_PLUGIN)
 
 /// increased for backward-compatible changes, e.g. add new function
-/// Caller API <= Plugin API -> plugin is fully compatible
-/// Caller API > Plugin API -> plugin is not fully compatible, caller should use extra checks to use plugins with older API
+/// Caller API <= Plugin API -> plugins is fully compatible
+/// Caller API > Plugin API -> plugins is not fully compatible, caller should use extra checks to use plugins with older API
 #define CAPTURE_API_VERSION 1
 
 /// increased for incompatible changes, e.g. remove function argument
-/// Caller ABI == Plugin ABI -> plugin is compatible
-/// Caller ABI > Plugin ABI -> plugin is not compatible, caller should use shim code to use old ABI plugins (caller may know how lower ABI works, so it is possible)
-/// Caller ABI < Plugin ABI -> plugin can't be used (plugin should provide interface with lower ABI to handle that)
+/// Caller ABI == Plugin ABI -> plugins is compatible
+/// Caller ABI > Plugin ABI -> plugins is not compatible, caller should use shim code to use old ABI plugins (caller may know how lower ABI works, so it is possible)
+/// Caller ABI < Plugin ABI -> plugins can't be used (plugins should provide interface with lower ABI to handle that)
 #define CAPTURE_ABI_VERSION 1
 
 #else // !defined(BUILD_PLUGIN)

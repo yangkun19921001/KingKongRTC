@@ -53,7 +53,7 @@ namespace kkrtc {
 #ifdef _WIN32
             plugin::FileSystemPath_t moduleName = plugin::toFileSystemPath(
                     plugin::libraryPrefix() + "kkrtc_" + baseName_l + plugin::librarySuffix());
-            //plugin::FileSystemPath_t moduleName  = plugin::toFileSystemPath("win_capture_ds_lib.dll");
+            //plugins::FileSystemPath_t moduleName  = plugins::toFileSystemPath("win_capture_ds_lib.dll");
 
 #ifndef WINRT
             if (baseName_u == "FFMPEG")  // backward compatibility
@@ -86,7 +86,7 @@ namespace kkrtc {
     }
 #endif // _DEBUG && DEBUG_POSTFIX
 #else
-            KKLogInfoTag("kkrtc_cap_backend_plugin")<< "VideoIO plugin (" << baseName << "): glob is '" << plugin_expr << "', " << paths.size() << " location(s)";
+            KKLogInfoTag("kkrtc_cap_backend_plugin")<< "VideoIO plugins (" << baseName << "): glob is '" << plugin_expr << "', " << paths.size() << " location(s)";
           for (const std::string& path : paths)
           {
               if (path.empty())
@@ -100,7 +100,7 @@ namespace kkrtc {
               copy(candidates.begin(), candidates.end(), back_inserter(results));
           }
 #endif
-            KKLogInfoTag("kkrtc_backend_plugin") << "Found " << results.size() << " plugin(s) for " << baseName;
+            KKLogInfoTag("kkrtc_backend_plugin") << "Found " << results.size() << " plugins(s) for " << baseName;
             return results;
         }
 

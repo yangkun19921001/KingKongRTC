@@ -21,7 +21,7 @@ namespace kkrtc {
 
         static const struct VideoProcessorBackendInfo builtin_backends[] =
                 {
-#ifdef HAVE_DSHOW
+#ifdef HAVE_VPROCESSOR_DEFAULT
                         DECLARE_VPRO_DYNAMIC_BACKEND(KK_VPRO_DEF, "video_processor_default")
 #endif
 

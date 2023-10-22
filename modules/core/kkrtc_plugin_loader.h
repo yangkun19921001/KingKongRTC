@@ -158,7 +158,7 @@ namespace kkrtc {
             DynamicLib &operator=(const DynamicLib &) = delete;
         };
         std::vector<plugin::FileSystemPath_t> getPluginCandidates(const std::string &baseName);
-    }//plugin
+    }//plugins
 }//kkrtc
 
 

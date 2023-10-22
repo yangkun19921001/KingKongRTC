@@ -23,7 +23,7 @@ namespace kkrtc {
 
             bool DefaultVideoPorcessor::Process(VideoFrame &videoFrame) {
                 ++this->frames_;
-                return true;
+                return video_processor_chain_.process(videoFrame);
             }
 
             const KKMediaFormat &DefaultVideoPorcessor::GetMediaFormats() const {
@@ -32,13 +32,15 @@ namespace kkrtc {
 
             void DefaultVideoPorcessor::Initialize(const KKMediaFormat &mediaFormats) {
                 this->media_format_ = mediaFormats;
+                //todo ... 美颜->滤镜->等
+//                video_processor_chain_.addProcessor()
             }
 
             void DefaultVideoPorcessor::SetLogCallback(KKLogObserver *pObserver) {
                 this->log_callback_ = pObserver;
             }
         } //def
-    }//plugin
+    }//plugins
 }//kkrtc
 
 
@@ -61,6 +63,8 @@ static int kkrtc_initialize(KkPluginVideoProcessor *handle, void *param) {
                 KKLogConfig_InitGlobLogger(logger)
                 KKLogInfoTag("DSHOW") << "initialize logger succeed.";*/
             }
+            kkrtc::KKMediaFormat parameters(plugParam->c_params, plugParam->n_params);
+            def->Initialize(parameters);
         }
         return 0;
     }

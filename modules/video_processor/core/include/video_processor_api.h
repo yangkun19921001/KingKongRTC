@@ -13,8 +13,9 @@ namespace kkrtc {
                 : public VideoProcessorModule, public VideoSinkInterface<VideoFrame>, public kkrtc::KKLogObserver {
         public:
             ~VideoProcessor() override;
-
             VideoProcessor();
+            VideoProcessor(const KKVideoProcessorAPIs api, const kkrtc::KKMediaFormat &format);
+            VideoProcessor(const KKVideoProcessorAPIs api);
 
             bool IsStarted();
 

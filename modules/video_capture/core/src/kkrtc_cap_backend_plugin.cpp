@@ -30,13 +30,13 @@ namespace kkrtc {
                             break;
                         if (!kkrtc_cap_api_) {
                             KKLogInfoTag("PluginCapBackend")
-                                << "Video CAP: plugin is incompatible (can't be initialized): "
+                                << "Video CAP: plugins is incompatible (can't be initialized): "
                                 << dynamicLib_->getName();
                             return;
                         }
                     }
                 } else {
-                    KKLogInfoTag("PluginCapBackend") << "Video CAP: missing plugin init function: '" << init_name
+                    KKLogInfoTag("PluginCapBackend") << "Video CAP: missing plugins init function: '" << init_name
                                                      << "', file: "
                                                      << dynamicLib_->getName();
                 }
@@ -101,7 +101,7 @@ namespace kkrtc {
                         loadPlugin();
                 }
                 catch (...) {
-                    KKLogErrorTag("PluginCapBackendFactory") << "Video CAP: exception during plugin loading: "
+                    KKLogErrorTag("PluginCapBackendFactory") << "Video CAP: exception during plugins loading: "
                                                              << baseName_ << ". SKIP";
                 }
                 initialized = true;
@@ -129,7 +129,7 @@ namespace kkrtc {
                     return;
                 }
                 catch (...) {
-                    KKLogWarnTag("kkrtc_cap_backend_plugin") << "Video CAP: exception during plugin initialization: "
+                    KKLogWarnTag("kkrtc_cap_backend_plugin") << "Video CAP: exception during plugins initialization: "
                                                              << plugin::toPrintablePath(plugin) << ". SKIP";
                 }
             }
@@ -142,7 +142,7 @@ namespace kkrtc {
         public:
             ~PluginCapture() {
                 if (0 != cap_plugin_api_->capture_release(kk_capture_)) {
-                    KKLogErrorTag("kkrtc_cap_backend_plugin") << "Video CAP: Can't release capture by plugin '";
+                    KKLogErrorTag("kkrtc_cap_backend_plugin") << "Video CAP: Can't release capture by plugins '";
 
                 };
                 kk_capture_ = nullptr;
